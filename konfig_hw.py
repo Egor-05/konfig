@@ -8,10 +8,10 @@ def exep(name, *args):
 
 
 def ls_funcs(files, command):
-    files = [j for j in files if '.' in j]
+    f = [j for j in files if '.' in j]
     dirs = [j for j in files if '.' not in j]
-    lst = files + dirs
-    delim = '\n'
+    lst = f + dirs
+    delim = '\t'
     for j in command:
         if j == 'r':
             lst.sort(reverse=True)
@@ -33,7 +33,11 @@ def ls(name, *args):
     elif not args or args[0] == '.':
         a = current
     elif len(args) == 1:
-        a = current + '/' + args[0].strip('/')
+        if args[0][0] != '-':
+            a = current + '/' + args[0].strip('/')
+        else:
+            com = args[0][1:]
+            a = current
     else:
         print('ls: unrecognised option: ' + args[2])
         return
@@ -50,8 +54,8 @@ def cd(name, *args):
         print('bash: cd: слишком много аргументов')
 
     a = file_system[current]
-    if args[0] in a:
-        current += '/' + args[0]
+    if args[0].strip('/') in a:
+        current += '/' + args[0].strip('/')
     elif args[0] == '..':
         if len(current.split('/')) > 1:
             current = '/'.join(current.split('/')[:-1])
@@ -61,8 +65,8 @@ def cd(name, *args):
         print(f'bash: cd: {args[0]}: Нет такого файла или каталога')
 
 
-def clear():
-    os.system('clear')
+def cl(*args):
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def echo(name, *args):
@@ -70,7 +74,7 @@ def echo(name, *args):
 
 
 def ex(*args):
-    os.system('exit')
+    exit()
 
 
 parser = argparse.ArgumentParser()
@@ -80,23 +84,26 @@ parser.add_argument('-s', '--script', required=True)
 
 args = parser.parse_args()
 
-file_system = {}
-commands = {'ls': ls, 'cd': cd, 'echo': echo, 'clear': clear, 'exit': ex}
 user = args.user
 glob_path = args.path
 path = args.script
+
+file_system = {}
+commands = {'ls': ls, 'cd': cd, 'echo': echo, 'clear': cl, 'exit': ex}
+
 # user = 'egor'
 # glob_path = 'fs.tar'
-# path = 'fs/ts1/script.txt'
+# path = 'script.txt'
 with tarfile.open(glob_path, 'r') as f:
-    with f.extractfile(path) as file:
-        script = file.read().decode('utf-8')
     for i in f.getmembers():
         a = i.name.split('/')
         key = '/'.join(a[:-1])
         value = a[-1]
         file_system[key] = file_system.get(key, []) + [value]
     current = file_system[''][0]
+
+with open(path) as file:
+    script = file.read()
 
 for i in script.strip().split('\n'):
     s = i.split()
