@@ -1,0 +1,11 @@
+{
+    "version": 1.0,
+    "dependencies": [2, 1, 4, 3],
+    "settings": [1, 2],
+}
+
+{
+    "port": 8080,
+    "max_connections": 100
+}
+

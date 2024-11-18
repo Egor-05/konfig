@@ -1,0 +1,2 @@
+visualizer_path,package_name,image_path,repository_url
+.,requests,dependencies,https://github.com/psf/requests
