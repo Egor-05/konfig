@@ -67,8 +67,8 @@ def encoder(text, binary):
 
 
 if __name__ == "__main__":
-    text_file = 'test.txt'#sys.argv[1]
-    binary_file = 'binary_test.bin'#sys.argv[2]
+    text_file = sys.argv[1]
+    binary_file = sys.argv[2]
     try:
         log_file = sys.argv[3]
     except IndexError:
