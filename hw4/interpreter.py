@@ -2,9 +2,6 @@ import sys
 import json
 
 
-memory = [0] * 1000
-
-
 def interpreter(filename, memory):
     with open(filename, 'rb') as f:
         binary_data = f.read()
@@ -42,12 +39,16 @@ def interpreter(filename, memory):
             e = int(bit_string[68:][::-1], 2)
             memory[b] = memory[c + d] - memory[e]
 
+    return memory[0:13]
 
-binary_file = sys.argv[1]
-result_file = sys.argv[2]
-from_idx = int(sys.argv[3])
-to_idx = int(sys.argv[4])
-interpreter(binary_file, memory)
 
-with open(result_file, 'w') as f:
-    json.dump(memory[from_idx:to_idx + 1], f)
+if __name__ == "__main__":
+    binary_file = 'binary_test.bin'#sys.argv[1]
+    result_file = 'result_test.json'#sys.argv[2]
+    from_idx = 0#int(sys.argv[3])
+    to_idx = 10#int(sys.argv[4])
+    memory = [0] * 1000
+
+    with open(result_file, 'w') as f:
+        print(interpreter(binary_file, memory))
+        json.dump(memory[from_idx:to_idx + 1], f)

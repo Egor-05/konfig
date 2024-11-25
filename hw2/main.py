@@ -1,7 +1,8 @@
 import csv
 import sys
-import pkg_resources
+import requests
 from graphviz import Digraph
+import re
 
 
 def load_config(config_file):
@@ -11,30 +12,34 @@ def load_config(config_file):
 
 
 def get_dependencies(package_name):
-    dependencies = set()
+    dependencies = []
 
     try:
-        dist = pkg_resources.get_distribution(package_name)
-        for req in dist.requires():
-            dependencies.add(req.project_name)
-            dependencies.update(get_dependencies(req.project_name))
+        response = requests.get(f'https://pypi.org/pypi/{package_name}/json').json()
+        for i in response['info']['requires_dist']:
+            match = re.search(r'[\w\-]+', i)
+            dependencies.append(i[match.start():match.end()])
     except Exception as e:
-        raise ValueError(f"Ошибка при получении зависимостей для {package_name}: {e}")
-
+        pass
     return dependencies
 
 
-def create_dependency_graph(package_name, dependencies, output_path):
-    dot = Digraph(comment='Dependency Graph')
-
-    dot.node(package_name)
-
-    for dep in dependencies:
-        dot.node(dep)
-        dot.edge(package_name, dep)
-
-    dot.render(output_path, format='png', cleanup=True)
-    print(f"Граф зависимостей успешно сохранен в {output_path}")
+def create_dependency_graph(package_name,  dot, visited, depth=0, name=None):
+    if name and name != package_name:
+        dot.edge(name, package_name)
+    if depth > 1:
+        return
+    visited.add(package_name)
+    dependencies = get_dependencies(package_name)
+    c = 0
+    for i in dependencies:
+        if i in visited:
+            continue
+        if c > 5:
+            break
+        c += 1
+        dot.node(i)
+        create_dependency_graph(i, dot, visited, depth + 1, package_name)
 
 
 def main(config_file):
@@ -43,9 +48,9 @@ def main(config_file):
     package_name = config['package_name']
     output_image_path = config['image_path']
 
-    dependencies = get_dependencies(package_name)
-
-    create_dependency_graph(package_name, dependencies, output_image_path)
+    dot = Digraph(comment='Dependency Graph')
+    create_dependency_graph(package_name, dot, set())
+    dot.render(output_image_path, format='png', cleanup=True)
 
 
 if __name__ == "__main__":

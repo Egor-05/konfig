@@ -13,9 +13,14 @@ class TestConfigTranslator(unittest.TestCase):
         expected_output = 'items is {1, 2, 3};'
         self.assertEqual(translate(json_input), expected_output)
 
+    def test_math_translation(self):
+        json_input = '{"items": "1 + 3"}'
+        expected_output = 'items is [+ 1 3];'
+        self.assertEqual(translate(json_input), expected_output)
+
     def test_invalid_json(self):
         with self.assertRaises(ValueError) as context:
-            translate('{"name": "example", "value": }')
+            translate('{"name": 1, "value": }')
         self.assertTrue("JSON decode error" in str(context.exception))
 
     def test_invalid_name(self):

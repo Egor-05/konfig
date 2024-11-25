@@ -48,6 +48,7 @@ def parse_json(data):
         output.append(f"{key} is {parse_value(value, key)};")
     return "\n".join(output)
 
+
 def translate(json_input):
     try:
         data = json.loads(json_input)
@@ -58,16 +59,10 @@ def translate(json_input):
         raise ValueError(f"Error: {e}")
 
 
-json_input = """{
-    "app_name": 23,
-    "version": 1.0,
-    "dependencies": [2, 1, 4, 3],
-    "settings": [1, 2],
-    "a23": "app_name + 1",
-    "a": "sort(dependencies)"
-}""" #sys.stdin.read()
-try:
-    output = translate(json_input)
-    print(output)
-except Exception as e:
-    print(e, file=sys.stderr)
+if __name__ == '__main__':
+    json_input = sys.stdin.read()
+    try:
+        output = translate(json_input)
+        print(output)
+    except Exception as e:
+        print(e, file=sys.stderr)

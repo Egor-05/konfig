@@ -27,7 +27,7 @@ def encode_write(string):
     bit_string += bin(int(string[2]))[2:].rjust(27, '0')[::-1]
     bit_string = bit_string.ljust(96, '0')
     array = [int(bit_string[8 * i: 8 * i + 8], 2) for i in range(12)]
-    return array
+    return array, log
 
 def encode_sub(string):
     bit_string = '011001'
@@ -54,7 +54,7 @@ def encoder(text, binary):
     logs = []
     with open(text) as f:
         for i in f.readlines():
-            a = i.split()
+            a = i.strip().split()
             array, log = COMMANDS[a[0]](a)
             lines.append(array)
             logs.append(log)
@@ -65,14 +65,17 @@ def encoder(text, binary):
                 f.write(data)
     return logs
 
-text_file = sys.argv[1]
-binary_file = sys.argv[2]
-try:
-    log_file = sys.argv[3]
-except IndexError:
-    log_file = None
-logs = encoder(text_file, binary_file)
 
-if log_file:
-    with open(log_file, 'w') as f:
-        json.dump(logs, f)
+if __name__ == "__main__":
+    text_file = 'test.txt'#sys.argv[1]
+    binary_file = 'binary_test.bin'#sys.argv[2]
+    try:
+        log_file = sys.argv[3]
+    except IndexError:
+        log_file = None
+    logs = encoder(text_file, binary_file)
+
+    if log_file:
+        with open(log_file, 'w') as f:
+            json.dump(logs, f)
+
